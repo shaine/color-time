@@ -22,7 +22,7 @@ var fallColor = rgbColorTime('Sep 4th, 2015', 'MMM Do, YYYY'); // #00A659
 
 ## Usage
 
-The module is a method used to create a method for retrieving the color for the specified date. Call the module method with the desired configuration of yearly colors to receive the curried value calculation method. The following example creates a calculation method using only a year-long red color:
+The module is a function used to create a function for retrieving the color for the specified date. Call the module function with the desired configuration of yearly colors to receive the curried value calculation function. The following example creates a calculation function using only a year-long red color:
 
 ```javascript
 var redColorTime = require('color-time')({
@@ -30,7 +30,7 @@ var redColorTime = require('color-time')({
 });
 ```
 
-To retrieve the value of a color for a given day, call that method with arguments that are parseable by [moment.js](http://momentjs.com/).
+To retrieve the value of a color for a given day, call that function with arguments that are parseable by [moment.js](http://momentjs.com/).
 
 ```javascript
 var julyColor = redColorTime('Jul 1st, 2015', 'MMM Do, YYYY'); // #FF0000

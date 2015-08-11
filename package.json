@@ -1,5 +1,6 @@
 {
   "name": "color-time",
+  "repository": "shaine/color-time",
   "version": "0.0.1",
   "description": "Convert datetime into a color",
   "main": "index.js",

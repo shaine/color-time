@@ -1,4 +1,5 @@
 # color-time
+[![Build Status](https://travis-ci.org/shaine/color-time.svg?branch=master)](https://travis-ci.org/shaine/color-time)
 Converts a day of the year into a color hex value based on a supplied color mapping. For example, if Jan 01 is #FFF and Dec 31 is #000, then Jul 02 will work out to be a mid-grey (#808080).
 
 ## Example

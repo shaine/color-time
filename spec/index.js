@@ -187,4 +187,19 @@ describe('#colorTime', function() {
         expect(value)
             .to.equal('#00FF00');
     });
+
+    it('should calculate a color from multiple days', function() {
+        // Set up
+        var rgbColorTime = colorTime({
+            0: '#f00',
+            182: '#0f0',
+            365: '#00f'
+        });
+
+        var value = rgbColorTime('Sep 4th, 2015', 'MMM Do, YYYY');
+
+        // Verify expectations
+        expect(value)
+            .to.equal('#00A659');
+    });
 });

@@ -1,0 +1,25 @@
+{
+  "name": "color-time",
+  "version": "0.0.1",
+  "description": "Convert datetime into a color",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "keywords": [
+    "color",
+    "datetime"
+  ],
+  "author": "Shaine Hatch <shaine@squidtree.com> (http://squidtree.com)",
+  "license": "MIT",
+  "dependencies": {
+    "color": "^0.10.1",
+    "moment": "^2.10.6"
+  },
+  "devDependencies": {
+    "chai": "^3.2.0",
+    "mocha": "^2.2.5",
+    "sinon": "^1.15.4",
+    "sinon-chai": "^2.8.0"
+  }
+}

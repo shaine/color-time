@@ -25,6 +25,8 @@ var fallColor = rgbColorTime('Sep 4th, 2015', 'MMM Do, YYYY'); // #00A659
 
 ## Usage
 
+### Yearly Color Cycle
+
 The module is a function used to create a function for retrieving the color for the specified date. Call the module function with the desired configuration of yearly colors to receive the curried value calculation function. The following example creates a calculation function using only a year-long red color:
 
 ```javascript
@@ -52,3 +54,52 @@ var randomColorTime = require('color-time')({
     256: '#aaa'
 });
 ```
+
+### Color Aging
+
+A color can be aged over time. To retrieve an aged color, first retrieve a calculation function with the desired aging properties. Required are `maxAgeYears` to describe over how many years a color may age to its maximum aged color, and `maxAgeFilterPercentage` to describe what percentage of the filter to apply at the maximum age.
+
+An aging function must also be supplied. Currently built in filters, which get passed to the config as a string to `agingFn`, are:
+
+- `'greyscale'` - Gradually shift the color to its greyscale value ([converting color to greyscale](https://en.wikipedia.org/wiki/Grayscale#Converting_color_to_grayscale))
+- custom function
+
+Example of a greyscale aging:
+
+```javascript
+var agedColorTime = require('color-time')({
+    0: '#f00',
+    265: '#ff0',
+    maxAgeYears: 10, // Age color to greyscale over 10 years
+    maxAgeFilterPercentage: .75, // At the end of the aging, the color has converted to 75% greyscale,
+    agingFn: 'greyscale'
+});
+```
+
+A custom aging function may be provided to perform any desired modification to the color. It will be called with arguments from the config and from the calculation function: `fn(currentColorHexString, numberOfYearsToAge, maxAgeYears, maxAgeFilterPercentage)`
+
+```javascript
+var agedColorTime = require('color-time')({
+    0: '#f00',
+    265: '#ff0',
+    maxAgeYears: 10,
+    maxAgeFilterPercentage: .75
+    agingFn: function(currentColorHexString, numberOfYearsToAge, maxAgeYears, maxAgeFilterPercentage) {
+        // Do whatever
+        return '#00f'; // Return a hex color string at the end
+    }
+});
+```
+
+To calculate a given color with an age, request the color as usual with a full date.
+
+```javascript
+var agedColor = agedColorTime('Jul 1st, 1915', 'MMM Do, YYYY'); // Get the July 1st color, aged ~100 years
+```
+
+## Config
+
+- **<0-365> _string|object_** Day of year as key, valid CSS color string or descriptive object (see [color setters](https://www.npmjs.com/package/color#setters))
+- **maxAgeYears _number_** _(optional, default: undefined)_ Maximum number of years a color can age for, after which no further aging modification will be added
+- **maxAgeFilterPercentage _number_** _(optional, default: undefined)_ A number between 0 and 1 indicating the maximum amount of the filter should be applied at the maximum age. 0 is no applied filter, 1 is filter added at 100% effect.
+- **agingFn _string|function_** (optional, default: noop) An optional function by which to calculate an aged color. May select from a built-in list of aging filters (see [Color Aging](#color-aging)) or provide a custom function (see above).

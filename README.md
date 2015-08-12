@@ -62,7 +62,7 @@ A color can be aged over time. To retrieve an aged color, first retrieve a calcu
 An aging function must also be supplied. Currently built in filters, which get passed to the config as a string to `agingFn`, are:
 
 - `'greyscale'` - Gradually shift the color to its greyscale value ([converting color to greyscale](https://en.wikipedia.org/wiki/Grayscale#Converting_color_to_grayscale))
-- custom function
+- `fn(currentColorHexString, numberOfYearsToAge, maxAgeYears, maxAgeFilterPercentage)` - Custom function to manually calculate an aged color
 
 Example of a greyscale aging:
 
@@ -99,7 +99,7 @@ var agedColor = agedColorTime('Jul 1st, 1915', 'MMM Do, YYYY'); // Get the July 
 
 ## Config
 
-- **<0-365> _string|object_** Day of year as key, valid CSS color string or descriptive object (see [color setters](https://www.npmjs.com/package/color#setters))
-- **maxAgeYears _number_** _(optional, default: undefined)_ Maximum number of years a color can age for, after which no further aging modification will be added
+- **<0-365> _string|object_** Day of year as key, valid CSS color string or descriptive object (see [color setters](https://www.npmjs.com/package/color#setters)).
+- **maxAgeYears _number_** _(optional, default: undefined)_ Maximum number of years a color can age for, after which no further aging modification will be added.
 - **maxAgeFilterPercentage _number_** _(optional, default: undefined)_ A number between 0 and 1 indicating the maximum amount of the filter should be applied at the maximum age. 0 is no applied filter, 1 is filter added at 100% effect.
 - **agingFn _string|function_** (optional, default: noop) An optional function by which to calculate an aged color. May select from a built-in list of aging filters (see [Color Aging](#color-aging)) or provide a custom function (see above).

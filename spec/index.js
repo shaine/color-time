@@ -4,6 +4,7 @@ var chai = require('chai');
 var sinon = require('sinon');
 var sinonChai = require('sinon-chai');
 var noop = require('node-noop').noop;
+var moment = require('moment');
 
 chai.use(sinonChai);
 var expect = chai.expect;
@@ -83,12 +84,41 @@ describe('#setupConfig', function() {
 
 describe('#getDayOfYearFromDate', function() {
     it('should get the day of year from a date string', function() {
+        // Set up
+        var date = moment('Aug 9th, 2015', 'MMM Do, YYYY')
+
         // Run unit
-        var value = colorTime.__getDayOfYearFromDate('Aug 9th, 2015', 'MMM Do, YYYY');
+        var value = colorTime.__getDayOfYearFromDate(date);
 
         // Verify expectations
         expect(value)
             .to.equal(220);
+    });
+});
+
+describe('#getYearsSinceDate', function() {
+    it('should get the years since a date', function() {
+        // Set up
+        var date = moment('Aug 9th, 1915', 'MMM Do, YYYY')
+        sinon.stub(moment.fn, 'diff')
+            .withArgs(date)
+            .returns(1234);
+        sinon.stub(moment, 'duration')
+            .withArgs(1234)
+            .returns({
+                asYears: sinon.stub().returns(100)
+            });
+
+        // Run unit
+        var value = colorTime.__getYearsSinceDate(date);
+
+        // Tear down
+        moment.fn.diff.restore();
+        moment.duration.restore();
+
+        // Verify expectations
+        expect(value)
+            .to.equal(100);
     });
 });
 
@@ -267,6 +297,8 @@ describe('#colorTime', function() {
 
     it('should calculate an aged color', function() {
         // Set up
+        sinon.stub(moment.duration.fn, 'asYears')
+            .returns(5);
         var rgbColorTime = colorTime({
             0: '#f00',
             182: '#0f0',
@@ -276,7 +308,11 @@ describe('#colorTime', function() {
             agingFn: 'greyscale'
         });
 
-        var value = rgbColorTime('Sep 4th, 2015', 'MMM Do, YYYY', 5);
+        // Run unit
+        var value = rgbColorTime('Sep 4th, 2010', 'MMM Do, YYYY');
+
+        // Tear down
+        moment.duration.fn.asYears.restore();
 
         // Verify expectations
         expect(value)

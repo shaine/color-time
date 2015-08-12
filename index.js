@@ -61,11 +61,15 @@ var setupConfig = function setupConfig(options) {
     };
 };
 
-var getDayOfYearFromDate = function getDayOfYearFromDate() {
-    var date = moment.apply(undefined, arguments);
-
+var getDayOfYearFromDate = function getDayOfYearFromDate(date) {
     return parseInt(date.format('DDDD')) - 1;
-}
+};
+
+var getYearsSinceDate = function getYearsSinceDate(date) {
+    var now = moment();
+
+    return moment.duration(now.diff(date)).asYears();
+};
 
 var getBoundingDayConfigsForDay = function getBoundingDayConfigsForDay(days, day) {
     var minDay;
@@ -144,27 +148,9 @@ var colorTime = function colorTime(options) {
     var config = setupConfig(options);
 
     return function colorTimeInstance() {
-        // Iterate through arguments to figure out what values were received
-        var agedYears = 0;
-        var dateArgs = [];
-        // Important: You should not slice on arguments because it prevents
-        // optimizations in JavaScript engines (V8 for example). Instead, try
-        // constructing a new array by iterating through the arguments object.
-        // https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Functions/arguments
-        for (var i = 0; i < arguments.length; i++) {
-            var argument = arguments[i];
-            // If last argument is a number
-            if (i === arguments.length - 1 && typeof argument === 'number') {
-                // Use it as the date year
-                agedYears = argument;
-            // If not a numeric last arg
-            } else {
-                // Give it to the date function
-                dateArgs.push(argument);
-            }
-        }
-
-        var dayOfYear = getDayOfYearFromDate.apply(undefined, dateArgs);
+        var date = moment.apply(undefined, arguments);
+        var agedYears = getYearsSinceDate(date);
+        var dayOfYear = getDayOfYearFromDate(date);
 
         var boundingDayConfigs = getBoundingDayConfigsForDay(config.days, dayOfYear);
         var minDate = boundingDayConfigs[0];
@@ -191,5 +177,6 @@ colorTime.__getBoundingDayConfigsForDay = getBoundingDayConfigsForDay;
 colorTime.__getWeightBetweenDaysForDay = getWeightBetweenDaysForDay;
 colorTime.__getWeightedColorAverage = getWeightedColorAverage;
 colorTime.__getColorAgedByGreyscale = getColorAgedByGreyscale;
+colorTime.__getYearsSinceDate = getYearsSinceDate;
 
 module.exports = colorTime;

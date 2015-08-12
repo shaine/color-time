@@ -3,6 +3,7 @@ var colorTime = require('../index');
 var chai = require('chai');
 var sinon = require('sinon');
 var sinonChai = require('sinon-chai');
+var noop = require('node-noop').noop;
 
 chai.use(sinonChai);
 var expect = chai.expect;
@@ -27,9 +28,7 @@ describe('#setupConfig', function() {
         // Run unit
         var value = colorTime.__setupConfig({
             5: '#f00',
-            350: '#0f0',
-            maxDesaturationYear: 5,
-            maxDesaturationLevel: .5
+            350: '#0f0'
         });
 
         // Verify expectations
@@ -42,9 +41,43 @@ describe('#setupConfig', function() {
                     day: 350,
                     color: '#0f0'
                 }],
-                maxDesaturationYear: 5,
-                maxDesaturationLevel: .5
+                agingFn: noop,
+                maxAgeFilterPercentage: undefined,
+                maxAgeYears: undefined
             });
+    });
+
+    it('should set the aging function to greyscale', function() {
+        // Run unit
+        var value = colorTime.__setupConfig({
+            0: '#f00',
+            agingFn: 'greyscale',
+            maxAgeYears: 10,
+            maxAgeFilterPercentage: .5
+        });
+
+        // Verify expectations
+        expect(value.agingFn)
+            .to.equal(colorTime.__getColorAgedByLumninace);
+        expect(value.maxAgeYears)
+            .to.equal(10);
+        expect(value.maxAgeFilterPercentage)
+            .to.equal(.5);
+    });
+
+    it('should use a user-defined aging function', function() {
+        // Set up
+        var agingFn = function() {};
+
+        // Run unit
+        var value = colorTime.__setupConfig({
+            0: '#f00',
+            agingFn: agingFn
+        });
+
+        // Verify expectations
+        expect(value.agingFn)
+            .to.equal(agingFn);
     });
 });
 
@@ -155,6 +188,35 @@ describe('#getWeightedColorAverage', function() {
         // Verify expectations
         expect(value)
             .to.equal('#BF4000');
+    });
+});
+
+describe('#getColorAgedByGreyscale', function() {
+    it('should not modify the color if no options', function() {
+        // Run unit
+        var value = colorTime.__getColorAgedByLumninace('#f00', 0, undefined, undefined);
+
+        // Verify expectations
+        expect(value)
+            .to.equal('#FF0000');
+    });
+
+    it('should get a color partially aged by greyscale', function() {
+        // Run unit
+        var value = colorTime.__getColorAgedByLumninace('#f00', 5, 10, .5);
+
+        // Verify expectations
+        expect(value)
+            .to.equal('#D31313');
+    });
+
+    it('should get a color fully aged by greyscale', function() {
+        // Run unit
+        var value = colorTime.__getColorAgedByLumninace('#f00', 10, 10, .5);
+
+        // Verify expectations
+        expect(value)
+            .to.equal('#A62727');
     });
 });
 

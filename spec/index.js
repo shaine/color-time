@@ -58,7 +58,7 @@ describe('#setupConfig', function() {
 
         // Verify expectations
         expect(value.agingFn)
-            .to.equal(colorTime.__getColorAgedByLumninace);
+            .to.equal(colorTime.__getColorAgedByGreyscale);
         expect(value.maxAgeYears)
             .to.equal(10);
         expect(value.maxAgeFilterPercentage)
@@ -194,7 +194,7 @@ describe('#getWeightedColorAverage', function() {
 describe('#getColorAgedByGreyscale', function() {
     it('should not modify the color if no options', function() {
         // Run unit
-        var value = colorTime.__getColorAgedByLumninace('#f00', 0, undefined, undefined);
+        var value = colorTime.__getColorAgedByGreyscale('#f00', 0, undefined, undefined);
 
         // Verify expectations
         expect(value)
@@ -203,7 +203,7 @@ describe('#getColorAgedByGreyscale', function() {
 
     it('should get a color partially aged by greyscale', function() {
         // Run unit
-        var value = colorTime.__getColorAgedByLumninace('#f00', 5, 10, .5);
+        var value = colorTime.__getColorAgedByGreyscale('#f00', 5, 10, .5);
 
         // Verify expectations
         expect(value)
@@ -212,7 +212,7 @@ describe('#getColorAgedByGreyscale', function() {
 
     it('should get a color fully aged by greyscale', function() {
         // Run unit
-        var value = colorTime.__getColorAgedByLumninace('#f00', 10, 10, .5);
+        var value = colorTime.__getColorAgedByGreyscale('#f00', 10, 10, .5);
 
         // Verify expectations
         expect(value)
@@ -263,5 +263,23 @@ describe('#colorTime', function() {
         // Verify expectations
         expect(value)
             .to.equal('#00A659');
+    });
+
+    it('should calculate an aged color', function() {
+        // Set up
+        var rgbColorTime = colorTime({
+            0: '#f00',
+            182: '#0f0',
+            365: '#00f',
+            maxAgeYears: 10,
+            maxAgeFilterPercentage: .5,
+            agingFn: 'greyscale'
+        });
+
+        var value = rgbColorTime('Sep 4th, 2015', 'MMM Do, YYYY', 5);
+
+        // Verify expectations
+        expect(value)
+            .to.equal('#1B985E');
     });
 });

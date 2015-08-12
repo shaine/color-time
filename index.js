@@ -144,7 +144,27 @@ var colorTime = function colorTime(options) {
     var config = setupConfig(options);
 
     return function colorTimeInstance() {
-        var dayOfYear = getDayOfYearFromDate.apply(undefined, arguments);
+        // Iterate through arguments to figure out what values were received
+        var agedYears = 0;
+        var dateArgs = [];
+        // Important: You should not slice on arguments because it prevents
+        // optimizations in JavaScript engines (V8 for example). Instead, try
+        // constructing a new array by iterating through the arguments object.
+        // https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Functions/arguments
+        for (var i = 0; i < arguments.length; i++) {
+            var argument = arguments[i];
+            // If last argument is a number
+            if (i === arguments.length - 1 && typeof argument === 'number') {
+                // Use it as the date year
+                agedYears = argument;
+            // If not a numeric last arg
+            } else {
+                // Give it to the date function
+                dateArgs.push(argument);
+            }
+        }
+
+        var dayOfYear = getDayOfYearFromDate.apply(undefined, dateArgs);
 
         var boundingDayConfigs = getBoundingDayConfigsForDay(config.days, dayOfYear);
         var minDate = boundingDayConfigs[0];
@@ -154,7 +174,14 @@ var colorTime = function colorTime(options) {
 
         var color = getWeightedColorAverage(minDate.color, maxDate.color, weight);
 
-        return color;
+        var agedColor = config.agingFn(
+            color,
+            agedYears,
+            config.maxAgeYears,
+            config.maxAgeFilterPercentage
+        );
+
+        return agedColor || color;
     };
 };
 
@@ -163,6 +190,6 @@ colorTime.__getDayOfYearFromDate = getDayOfYearFromDate;
 colorTime.__getBoundingDayConfigsForDay = getBoundingDayConfigsForDay;
 colorTime.__getWeightBetweenDaysForDay = getWeightBetweenDaysForDay;
 colorTime.__getWeightedColorAverage = getWeightedColorAverage;
-colorTime.__getColorAgedByLumninace = getColorAgedByGreyscale;
+colorTime.__getColorAgedByGreyscale = getColorAgedByGreyscale;
 
 module.exports = colorTime;

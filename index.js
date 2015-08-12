@@ -4,38 +4,47 @@ Example usage:
 var colorTime = require('color-time')({
     0: '#0000ff',
     128: '#ff0000',
-    250: '#777777',
-    maxDesaturationYear: 10,
-    maxDesaturationLevel: 0.3
+    250: '#777777'
 });
 
 var todayColor = colorTime('now');
 ```
 */
 
-var color = require('color');
+var colorLib = require('color');
 var moment = require('moment');
+var noop = require('node-noop').noop;
 
 var setupConfig = function setupConfig(options) {
     var days = [];
-    var maxDesaturationLevel = 0;
-    var maxDesaturationYear = 0;
+    var agingFn = noop;
+    var maxAgeYears;
+    var maxAgeFilterPercentage;
 
     for (var key in options) {
         if (options.hasOwnProperty(key)) {
             var value = options[key];
             var keyInt = parseInt(key);
 
-            if (key === 'maxDesaturationYear') {
-                maxDesaturationYear = value;
-            } else if (key === 'maxDesaturationLevel') {
-                maxDesaturationLevel = value;
-            } else if (keyInt.toString() === key && keyInt >= 0 && keyInt < 366) {
+            // If the key-int as a string and the key are identical, then an
+            // int was passed as the key. If the int is a valid day of year:
+            if (keyInt.toString() === key && keyInt >= 0 && keyInt < 366) {
                 // Maximum number of days in a year is 366
                 days.push({
                     day: keyInt,
                     color: value
                 });
+            // If the key is the aging function
+            } else if (key === 'agingFn') {
+                if (value === 'greyscale') {
+                    agingFn = getColorAgedByGreyscale;
+                } else if (typeof value === 'function') {
+                    agingFn = value;
+                }
+            } else if (key === 'maxAgeYears') {
+                maxAgeYears = value;
+            } else if (key === 'maxAgeFilterPercentage') {
+                maxAgeFilterPercentage = value;
             }
 
             if (days.length < 1) {
@@ -46,8 +55,9 @@ var setupConfig = function setupConfig(options) {
 
     return {
         days: days,
-        maxDesaturationLevel: maxDesaturationLevel,
-        maxDesaturationYear: maxDesaturationYear
+        agingFn: agingFn,
+        maxAgeFilterPercentage: maxAgeFilterPercentage,
+        maxAgeYears: maxAgeYears
     };
 };
 
@@ -112,14 +122,49 @@ var getWeightBetweenDaysForDay = function getWeightBetweenDaysForDay(firstBoundi
 };
 
 var getWeightedColorAverage = function getWeightedColorAverage(firstColor, secondColor, weight) {
-    return color(secondColor).mix(color(firstColor), weight).hexString();
+    return colorLib(secondColor).mix(colorLib(firstColor), weight).hexString();
+};
+
+var getColorAgedByGreyscale = function getColorAgedByGreyscale(color, agedYears, maxAgeYears, maxAgeFilterPercentage) {
+    var color = colorLib(color);
+    var newColor = color;
+    var agedYears = agedYears || 0;
+
+    if (typeof maxAgeYears === 'number' || typeof maxAgeFilterPercentage === 'number') {
+        var agePercentage = (agedYears / maxAgeYears);
+        var weightedGreyscalePercentage = agePercentage * maxAgeFilterPercentage;
+
+        newColor = color.clone().greyscale().mix(color, weightedGreyscalePercentage);
+    }
+
+    return newColor.hexString();
 };
 
 var colorTime = function colorTime(options) {
     var config = setupConfig(options);
 
     return function colorTimeInstance() {
-        var dayOfYear = getDayOfYearFromDate.apply(undefined, arguments);
+        // Iterate through arguments to figure out what values were received
+        var agedYears = 0;
+        var dateArgs = [];
+        // Important: You should not slice on arguments because it prevents
+        // optimizations in JavaScript engines (V8 for example). Instead, try
+        // constructing a new array by iterating through the arguments object.
+        // https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Functions/arguments
+        for (var i = 0; i < arguments.length; i++) {
+            var argument = arguments[i];
+            // If last argument is a number
+            if (i === arguments.length - 1 && typeof argument === 'number') {
+                // Use it as the date year
+                agedYears = argument;
+            // If not a numeric last arg
+            } else {
+                // Give it to the date function
+                dateArgs.push(argument);
+            }
+        }
+
+        var dayOfYear = getDayOfYearFromDate.apply(undefined, dateArgs);
 
         var boundingDayConfigs = getBoundingDayConfigsForDay(config.days, dayOfYear);
         var minDate = boundingDayConfigs[0];
@@ -129,7 +174,14 @@ var colorTime = function colorTime(options) {
 
         var color = getWeightedColorAverage(minDate.color, maxDate.color, weight);
 
-        return color;
+        var agedColor = config.agingFn(
+            color,
+            agedYears,
+            config.maxAgeYears,
+            config.maxAgeFilterPercentage
+        );
+
+        return agedColor || color;
     };
 };
 
@@ -138,5 +190,6 @@ colorTime.__getDayOfYearFromDate = getDayOfYearFromDate;
 colorTime.__getBoundingDayConfigsForDay = getBoundingDayConfigsForDay;
 colorTime.__getWeightBetweenDaysForDay = getWeightBetweenDaysForDay;
 colorTime.__getWeightedColorAverage = getWeightedColorAverage;
+colorTime.__getColorAgedByGreyscale = getColorAgedByGreyscale;
 
 module.exports = colorTime;

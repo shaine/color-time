@@ -5,7 +5,8 @@
   "description": "Convert datetime into a color",
   "main": "index.js",
   "scripts": {
-    "test": "./node_modules/.bin/mocha spec"
+    "test": "mocha spec/",
+    "watch:test": "npm run test -- -w"
   },
   "keywords": [
     "color",
@@ -15,7 +16,8 @@
   "license": "MIT",
   "dependencies": {
     "color": "^0.10.1",
-    "moment": "^2.10.6"
+    "moment": "^2.10.6",
+    "node-noop": "0.0.1"
   },
   "devDependencies": {
     "chai": "^3.2.0",

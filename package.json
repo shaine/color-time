@@ -6,7 +6,8 @@
   "main": "index.js",
   "scripts": {
     "test": "mocha spec/",
-    "watch:test": "npm run test -- -w"
+    "watch:test": "npm run test -- -w",
+    "prepublish": "npm run test"
   },
   "keywords": [
     "color",

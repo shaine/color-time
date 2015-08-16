@@ -232,6 +232,15 @@ describe('#getWeightBetweenDaysForDay', function() {
         expect(value)
             .to.equal(0);
     });
+
+    it('should handle boundary wrap', function() {
+        // Run unit
+        var value = colorTime.__getWeightBetweenDaysForDay(344, 20, 0);
+
+        // Verify expectations
+        expect(value)
+            .to.equal(.5);
+    });
 });
 
 describe('#getWeightedColorAverage', function() {

@@ -126,10 +126,12 @@ var getBoundingDayConfigsForDay = function getBoundingDayConfigsForDay(days, day
 };
 
 var getWeightBetweenDaysForDay = function getWeightBetweenDaysForDay(firstBoundingDay, secondBoundingDay, day) {
-    var min = firstBoundingDay < secondBoundingDay? firstBoundingDay : secondBoundingDay;
-    var max = firstBoundingDay > secondBoundingDay? firstBoundingDay : secondBoundingDay;
+    // Handle boundary wrap
+    if (firstBoundingDay > day) {
+        firstBoundingDay = firstBoundingDay - 364;
+    }
 
-    var weight = (day - min) / (max - min);
+    var weight = (day - firstBoundingDay) / (secondBoundingDay - firstBoundingDay);
 
     // Handle possible NaN for 0-length day range
     // and ∞ for 0-length day 0

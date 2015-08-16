@@ -290,6 +290,15 @@ describe('#getColorAgedByGreyscale', function() {
         expect(value)
             .to.equal('#A62727');
     });
+
+    it('should get a color beyond max age by greyscale', function() {
+        // Run unit
+        var value = colorTime.__getColorAgedByGreyscale('#f00', 20, 10, .5);
+
+        // Verify expectations
+        expect(value)
+            .to.equal('#A62727');
+    });
 });
 
 describe('#colorTime', function() {

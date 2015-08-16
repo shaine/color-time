@@ -158,6 +158,9 @@ var getColorAgedByGreyscale = function getColorAgedByGreyscale(color, agedYears,
 
     if (typeof maxAgeYears === 'number' || typeof maxAgeFilterPercentage === 'number') {
         var agePercentage = (agedYears / maxAgeYears);
+        if (agePercentage > 1) {
+            agePercentage = 1;
+        }
         var weightedGreyscalePercentage = agePercentage * maxAgeFilterPercentage;
 
         newColor = color.clone().greyscale().mix(color, weightedGreyscalePercentage);

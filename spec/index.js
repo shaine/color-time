@@ -147,6 +147,30 @@ describe('#getBoundingDayConfigsForDay', function() {
             }]);
     });
 
+    it('should get the two bounding days from the config for day 0', function() {
+        // Run unit
+        var value = colorTime.__getBoundingDayConfigsForDay([{
+            day: 100,
+            color:  'foo'
+        }, {
+            day: 200,
+            color: 'bar'
+        }, {
+            day: 300,
+            color: 'baz'
+        }], 0);
+
+        // Verify expectations
+        expect(value)
+            .to.eql([{
+                day: 300,
+                color: 'baz'
+            }, {
+                day: 100,
+                color: 'foo'
+            }]);
+    });
+
     it('should get the two circular bounding days from the config for a day', function() {
         // Run unit
         var value = colorTime.__getBoundingDayConfigsForDay([{

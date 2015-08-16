@@ -78,22 +78,37 @@ var getBoundingDayConfigsForDay = function getBoundingDayConfigsForDay(days, day
     var maxColor;
     var first;
 
+    var configDayInt;
+    var configColor;
+
+    // Go through all day configurations
     for (var key in days) {
         var dayConfig = days[key];
-        var configDayInt = parseInt(dayConfig.day);
-        var configColor = dayConfig.color;
+        configDayInt = parseInt(dayConfig.day);
+        configColor = dayConfig.color;
 
+        // Take note of the earliest day
         if (typeof first === 'undefined') {
             first = dayConfig;
         }
 
         if (configDayInt <= day) {
+            // If the day is smaller than our day, it's the min
             minDay = configDayInt;
             minColor = configColor;
         } else if (typeof maxDay === 'undefined' && configDayInt > day) {
+            // If the day is larger than our day, and we haven't found one
+            // yet, this is the next day after ours is so it's the upper bound
             maxDay = configDayInt;
             maxColor = configColor;
         }
+    }
+
+    // If there is no min, use the latest day in the year
+    // The values are from the last run
+    if (typeof minDay === 'undefined') {
+        minDay = configDayInt;
+        minColor = configColor;
     }
 
     if (typeof maxDay === 'undefined') {

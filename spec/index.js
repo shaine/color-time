@@ -229,13 +229,22 @@ describe('#getWeightBetweenDaysForDay', function() {
         var value = colorTime.__getWeightBetweenDaysForDay(0, 0, 100);
 
         // Verify expectations
-        expect(value)
-            .to.equal(0);
+        expect(parseFloat(value.toFixed(2)))
+            .to.equal(.27);
     });
 
-    it('should handle boundary wrap', function() {
+    it('should handle boundary wrap in new year', function() {
         // Run unit
         var value = colorTime.__getWeightBetweenDaysForDay(344, 20, 0);
+
+        // Verify expectations
+        expect(value)
+            .to.equal(.5);
+    });
+
+    it('should handle boundary wrap at end of year', function() {
+        // Run unit
+        var value = colorTime.__getWeightBetweenDaysForDay(344, 20, 364);
 
         // Verify expectations
         expect(value)

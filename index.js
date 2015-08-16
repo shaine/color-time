@@ -126,9 +126,14 @@ var getBoundingDayConfigsForDay = function getBoundingDayConfigsForDay(days, day
 };
 
 var getWeightBetweenDaysForDay = function getWeightBetweenDaysForDay(firstBoundingDay, secondBoundingDay, day) {
-    // Handle boundary wrap
+    // Handle new year boundary wrap
     if (firstBoundingDay > day) {
         firstBoundingDay = firstBoundingDay - 364;
+    }
+
+    // Handle end of year boundary wrap
+    if (secondBoundingDay < day) {
+        secondBoundingDay = secondBoundingDay + 364;
     }
 
     var weight = (day - firstBoundingDay) / (secondBoundingDay - firstBoundingDay);
